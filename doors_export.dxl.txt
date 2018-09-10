@@ -1,0 +1,117 @@
+// Timeout interval set to 0 (unlimited) number of DXL execution cycles to 
+// prevent timeouts from crashing
+pragma runLim, 0 
+
+/************************************************ 
+************** Variable definition **************
+************************************************/
+Object o = null
+
+//module m
+//module module_folder = "Interview"
+Module m = current
+Module mdl = "ESR_Interview"
+string ModuleName = ""
+
+string type
+
+/* DOORS Type Names 
+		Object
+		Link
+		Filter
+		Column
+		Attribute */
+		
+string attribobjtyp = "Objekttyp"
+string attribobjreq = "Requirements"
+string attribobjdev = "Development Responsible"
+string attribobjid = "Object ID"
+string attribobjimp = "Implementation Status"
+string attribobjtxt = "Object Text"
+
+string a1 = ""
+string a2 = ""
+string a3 = ""
+// Attributes to Export
+string attr1 = "Object ID"
+string attr2 = "Implementation Status"
+string attr3 = "Object Text"
+
+string f1 = "Anforderung"
+string f2 = "Valid"
+string f3 = "ESRLabs"
+
+
+int numreqs = 0; 
+int reqcount = 0;
+int linkcount = 0;
+int objcount = 0;
+
+Stream export = write("Export_esr_interview.csv")
+
+filtering off
+level 0
+
+
+/************************************************ 
+**************** Error Exceptions ***************
+************************************************/
+if (null m) {
+	ack "Please run this script from an open module"
+	halt
+}
+else ModuleName = fullName m
+//
+if (null export) {
+	ack "Error while trying to open export file"
+	return
+}
+if (!exists attribute attribobjtyp) {
+	ack "Attribute '" attribobjtyp "' has not been found in module"
+	halt
+}
+if (!exists attribute attribobjreq) {
+	ack "Attribute '" attribobjreq "' has not been found in module"
+	halt
+}
+if (!exists attribute attribobjtyp) {
+	ack "Attribute " attribobjtyp " has not been found in module"
+	halt
+}
+
+/************************************************ 
+****************** Main Function ****************
+************************************************/
+for o in mdl do {
+	/*a1 = o."Objekttyp"
+	a2 = o."Requirements"
+	a3 = o."Development Responsible"*/
+	
+	a1 = o.attribobjtyp
+	a2 = o.attribobjreq
+	a3 = o.attribobjdev
+	
+	objcount ++
+	
+	if (a1 == f1) {
+		if (a2 == f2) {
+			if (a3 = f3) {
+				numreqs ++ 
+				
+				// CHECK FOR LINKS
+				
+				//outfile << numreqs, " o."Object ID ", " o."Object Implementation Status ", linkcount, " o.ObjectText" "\n"
+				outfile << numreqs,
+				outfile << attribobjid,
+				outfile << attribobjimp,
+				outfile << linkcount,
+				outifle << attribobjtxt
+			} 
+		}
+	}
+}
+
+// infoBox("Finished exporting " numreqs " requirements out of " objcount " objects from DOORS Module " fullName(mdl) "\n")
+export << "Finished exporting " numreqs " requirements out of " objcount " objects from DOORS Module " fullName(mdl) "\n"
+export << stringOf(dateOf(intOf(today)), "dd MMMM yyyy") "\n"
+close(export)
